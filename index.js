@@ -8,7 +8,7 @@ function drawLine(point1, point2){
     else{
         equation += "y = "+point1[1]
     }
-    calculator.setExpression({id:lineNumber, latex:equation})
+    calculator.setExpression({id:lineNumber, latex:equation, color:"#FF69B4"})
     lineNumber += 1
 }
 
@@ -47,7 +47,6 @@ function getRectangleCoordsInOrder(rectangleCoords){
             //pass
         }
         else{
-            console.log(i)
             orderedCoords[2] = rectangleCoords[i]
             break
         }
@@ -59,7 +58,6 @@ function getRectangleCoordsInOrder(rectangleCoords){
 function drawRectangle(rectangleCoords){
     rectangleCoords = getRectangleCoordsInOrder(rectangleCoords)
     for (i = 0; i < rectangleCoords.length-1; i++){
-        console.log(rectangleCoords)
         drawLine(rectangleCoords[i],rectangleCoords[i+1])
     }
     drawLine(rectangleCoords[0], rectangleCoords[rectangleCoords.length-1])
@@ -74,27 +72,72 @@ function drawPoints(points){
     }
 }
 
+function findDuplicates(rectangleCoords, rectangles, points){
+    // rectangle coords is a list of indicies of the points
+    
+    for (i = 0; i < rectangles.length; i++){
+        checkingRectangle = rectangles[i]
+        if (rectangleCoords[0] == checkingRectangle[0] && rectangleCoords[1] == checkingRectangle[1]){
+            return(true)
+        }
+        if (rectangleCoords[0] == checkingRectangle[1] && rectangleCoords[1] == checkingRectangle[0]){
+            return(true)
+        }
+    }
+    return(false)
+}
+
 function findRectangles(points){
-    points.sort()
-    numberOfSquares = 0
+    numberOfRectangles = 0
+    rectangles = []
     for (p1 in points){
         for (p2 in points){
+
+            // i am checking for 2 diagonal points, and then finding the other 2 verticies.
+            // the 2 points must be not parallel and not equal
             notParallel = points[p1][0] != points[p2][0] && points[p1][1] != points[p2][1]
-            pointsExist = points.includes([points[p2][0],points[p1][1]]) && points.includes([points[p1][0],points[p2][1]])
-            if (points[p1] != points[p2] && notParallel){
-                numberOfSquares += 1
-                drawSquare(points[p1],points[p2])
+            notEqual = p1 != p2
+
+            // point 3 and 4 are the other 2 points that must exist
+            point3 = [points[p2][0],points[p1][1]]
+            point4 = [points[p1][0],points[p2][1]]
+            point3Exists = false
+            point4Exists = false
+            indexSet1 = [p1,p2]
+            indexSet2 = []
+            for (i = 0; i < points.length; i++){
+                if (points[i][0] == point3[0] && points[i][1] == point3[1]){
+                    point3Exists = true
+                    indexSet2.push(i)
+                }
+                if (points[i][0] == point4[0] && points[i][1] == point4[1]){
+                    point4Exists = true
+                    indexSet2.push(i)
+                }
+            }
+            pointsExist = point4Exists && point3Exists
+            validRectangle = notEqual && notParallel && pointsExist
+            if (validRectangle){
+                if (findDuplicates(indexSet1, rectangles, points) || findDuplicates(indexSet2, rectangles, points)){
+                    // pass
+                }
+                else{
+                    rectangleCoords = [points[p1], points[p2], [points[p1][0],points[p2][1]], [points[p2][0],points[p1][1]]]
+                    rectangles.push([p1,p2])
+                    drawRectangle(rectangleCoords)
+                    numberOfRectangles += 1
+                }
             } 
         }
     }
+    console.log(numberOfRectangles)
+    console.log(rectangles)
+    return(numberOfRectangles)
 }
 
 // all coords
-// var coords = [
-//     [0,0],[5,0],[0,5],[5,5],[8,5],[8,0],[40,5],[5,54],[6,7],[40,0],[8,54]
-// ]
 var coords = [
-    [0,0],[5,0],[0,5],[5,5],[8,5],[8,0]
+    [0,0],[5,0],[0,5],[5,5],[8,5],[8,0],[40,5],[5,54],[6,7],[40,0],[8,54],[0,54]
 ]
 
 // desmos init
@@ -102,7 +145,7 @@ var elt = document.getElementById('calculator');
 var calculator = Desmos.GraphingCalculator(elt, {
     keypad: false,
     zoomButtons: true,
-    expressions: true, //just for now
+    expressions: false,
     settingsMenu: false,
     lockViewport: false,
     autosize: true,
@@ -114,5 +157,4 @@ calculator.updateSettings({
     yAxisLabel: 'Y-Axis'
 });
 
-drawPoints(coords)
 findRectangles(coords)
