@@ -54,7 +54,11 @@ function getRectangleCoordsInOrder(rectangleCoords){
     return(orderedCoords)
 }
 
-// given sorted rectangle coords, draw the rectangle
+function getPointsFromIndexes(p1, p2){
+    return([points[p1], points[p2], [points[p1][0],points[p2][1]], [points[p2][0],points[p1][1]]])
+}
+
+// rectangle coords, draw the rectangle
 function drawRectangle(rectangleCoords){
     rectangleCoords = getRectangleCoordsInOrder(rectangleCoords)
     for (i = 0; i < rectangleCoords.length-1; i++){
@@ -72,9 +76,8 @@ function drawPoints(points){
     }
 }
 
-function findDuplicates(rectangleCoords, rectangles, points){
-    // rectangle coords is a list of indicies of the points
-    
+function findDuplicates(rectangleCoords, rectangles){
+    // rectangle coords is a list of indexes of the points
     for (i = 0; i < rectangles.length; i++){
         checkingRectangle = rectangles[i]
         if (rectangleCoords[0] == checkingRectangle[0] && rectangleCoords[1] == checkingRectangle[1]){
@@ -103,6 +106,8 @@ function findRectangles(points){
             point4 = [points[p1][0],points[p2][1]]
             point3Exists = false
             point4Exists = false
+
+            // index sets are opposite corners of rectangles
             indexSet1 = [p1,p2]
             indexSet2 = []
             for (i = 0; i < points.length; i++){
@@ -115,15 +120,17 @@ function findRectangles(points){
                     indexSet2.push(i)
                 }
             }
+
+            // validating the rectangle
             pointsExist = point4Exists && point3Exists
             validRectangle = notEqual && notParallel && pointsExist
             if (validRectangle){
-                if (findDuplicates(indexSet1, rectangles, points) || findDuplicates(indexSet2, rectangles, points)){
+                if (findDuplicates(indexSet1, rectangles) || findDuplicates(indexSet2, rectangles)){
                     // pass
                 }
                 else{
-                    rectangleCoords = [points[p1], points[p2], [points[p1][0],points[p2][1]], [points[p2][0],points[p1][1]]]
                     rectangles.push([p1,p2])
+                    // rectangleCoords = getPointsFromIndexes(p1,p2)
                     // drawRectangle(rectangleCoords)
                     numberOfRectangles += 1
                 }
@@ -132,30 +139,3 @@ function findRectangles(points){
     }
     return(rectangles)
 }
-
-// all coords
-var coords = [
-    [0,0],[5,0],[0,5],[5,5],[8,5],[8,0],[40,5],[5,54],[6,7],[40,0],[8,54],[0,54]
-]
-
-// desmos init
-var elt = document.getElementById('calculator');
-var calculator = Desmos.GraphingCalculator(elt, {
-    keypad: false,
-    zoomButtons: true,
-    expressions: false,
-    settingsMenu: false,
-    lockViewport: false,
-    autosize: true,
-    showResetButtonOnGraphpaper: true,
-    sliders: false,
-});
-calculator.updateSettings({
-    xAxisLabel: 'X-Axis', 
-    yAxisLabel: 'Y-Axis'
-});
-
-
-rectangles = findRectangles(coords)
-drawPoints(coords)
-fillTable(rectangles, coords)
