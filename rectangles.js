@@ -124,15 +124,13 @@ function findRectangles(points){
                 else{
                     rectangleCoords = [points[p1], points[p2], [points[p1][0],points[p2][1]], [points[p2][0],points[p1][1]]]
                     rectangles.push([p1,p2])
-                    drawRectangle(rectangleCoords)
+                    // drawRectangle(rectangleCoords)
                     numberOfRectangles += 1
                 }
             } 
         }
     }
-    console.log(numberOfRectangles)
-    console.log(rectangles)
-    return(numberOfRectangles)
+    return(rectangles)
 }
 
 // all coords
@@ -157,5 +155,7 @@ calculator.updateSettings({
     yAxisLabel: 'Y-Axis'
 });
 
-findRectangles(coords)
+
+rectangles = findRectangles(coords)
 drawPoints(coords)
+fillTable(rectangles, coords)
