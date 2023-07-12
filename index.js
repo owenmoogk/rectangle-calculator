@@ -12,9 +12,11 @@ var calculator = Desmos.GraphingCalculator(elt, {
     settingsMenu: false,
     lockViewport: false,
     autosize: true,
+    zoomFit: true,
     showResetButtonOnGraphpaper: true,
     sliders: false,
 });
+
 calculator.updateSettings({
     xAxisLabel: 'X-Axis', 
     yAxisLabel: 'Y-Axis'
@@ -28,8 +30,6 @@ drawPoints(points)
 fillTable(rectangles, points)
 
 function fillTable(rectangleIndexes, coords){
-    console.log(coords)
-    console.log(rectangleIndexes)
     table = document.getElementById("coord-holder")
     string = ""
     for (i = 0; i < rectangleIndexes.length; i++){
@@ -57,8 +57,8 @@ function resetScreen(){
     calculator.setBlank()
     drawPoints(points)
     activeElements = document.getElementsByClassName("active")
-    for (i = 0; i < activeElements.length; i++){
-        id = activeElements[i].id
+    for (var i = 0; i < activeElements.length; i++){
+        var id = activeElements[i].id
         showById(id)
     }
 }

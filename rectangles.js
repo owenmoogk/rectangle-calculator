@@ -2,11 +2,28 @@ lineNumber = 0
 // draw a line given 2 coords
 function drawLine(point1, point2){
     equation = ""
+    var min, max;
     if (point1[0] == point2[0]){
-        equation += "x = "+point1[0]
+        if (point1[1] < point2[1]){
+            min = point1[1];
+            max = point2[1]
+        }
+        else{
+            max = point1[1];
+            min = point2[1];
+        }
+        equation += `x = ${point1[0]} \\{ ${min} < y < ${max} \\}`
     }
     else{
-        equation += "y = "+point1[1]
+        if (point1[0] < point2[0]){
+            min = point1[0];
+            max = point2[0]
+        }
+        else{
+            max = point1[0];
+            min = point2[0];
+        }
+        equation += `y = ${point1[1]} \\{ ${min} < x < ${max} \\}`
     }
     calculator.setExpression({id:lineNumber, latex:equation, color:"#FF69B4"})
     lineNumber += 1
